@@ -19,8 +19,8 @@
 // @grant        GM_getValue
 // @grant        GM_registerMenuCommand
 // @grant        GM_addStyle
-// @downloadURL  https://raw.githubusercontent.com/Loge-Like/bilibili-pip-helper/main/bilibili-pip-helper.user.js
-// @updateURL    https://raw.githubusercontent.com/Loge-Like/bilibili-pip-helper/main/bilibili-pip-helper.user.js
+// @downloadURL  https://raw.githubusercontent.com/Loge-Like/bilibili-pip-helper/refs/heads/main/哔哩哔哩视频浮窗定位套件.user.js
+// @updateURL    https://raw.githubusercontent.com/Loge-Like/bilibili-pip-helper/refs/heads/main/哔哩哔哩视频浮窗定位套件.user.js
 // ==/UserScript==
 
 (function() {
@@ -1544,3 +1544,4 @@
     });
 
 })();
+
