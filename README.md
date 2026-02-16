@@ -41,6 +41,9 @@
    
 📥 安装方法
 
+    Github
+    https://raw.githubusercontent.com/Loge-Like/bilibili-pip-helper/refs/heads/main/哔哩哔哩视频浮窗定位套件.user.js
+
     安装用户脚本管理器：Tampermonkey 或 Violentmonkey
 
     待   定
