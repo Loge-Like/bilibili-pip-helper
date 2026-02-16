@@ -42,7 +42,7 @@
 📥 安装方法
 
     Github
-    [点击安装脚本](https://raw.githubusercontent.com/Loge-Like/bilibili-pip-helper/refs/heads/main/bilibili-pip-helper.js)
+    https://raw.githubusercontent.com/Loge-Like/bilibili-pip-helper/refs/heads/main/bilibili-pip-helper.js
 
     安装用户脚本管理器：Tampermonkey 或 Violentmonkey
 
