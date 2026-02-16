@@ -19,8 +19,8 @@
 // @grant        GM_getValue
 // @grant        GM_registerMenuCommand
 // @grant        GM_addStyle
-// @downloadURL  https://raw.githubusercontent.com/Loge-Like/bilibili-pip-helper/refs/heads/main/bilibili-pip-helper.js
-// @updateURL    https://raw.githubusercontent.com/Loge-Like/bilibili-pip-helper/refs/heads/main/bilibili-pip-helper.js
+// @downloadURL  https://update.greasyfork.org/scripts/566502/%E5%93%94%E5%93%A9%E5%93%94%E5%93%A9%E8%A7%86%E9%A2%91%E6%B5%AE%E7%AA%97%E5%AE%9A%E4%BD%8D%E5%8A%A9%E6%89%8B.user.js
+// @updateURL    https://update.greasyfork.org/scripts/566502/%E5%93%94%E5%93%A9%E5%93%94%E5%93%A9%E8%A7%86%E9%A2%91%E6%B5%AE%E7%AA%97%E5%AE%9A%E4%BD%8D%E5%8A%A9%E6%89%8B.user.js
 // ==/UserScript==
 
 (function() {
@@ -1544,4 +1544,5 @@
     });
 
 })();
+
 
