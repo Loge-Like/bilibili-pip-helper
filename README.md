@@ -1,4 +1,3 @@
-# bilibili-pip-helper
 ●哔哩哔哩视频浮窗定位助手：页面画中画悬浮播放，更沉浸的体验；页面智能定位，告别浏览器放大后的手动拖拽滚动条。优化B站观影体验。
   
   
@@ -41,14 +40,15 @@
    
 📥 安装方法
 
-    Github
-    https://raw.githubusercontent.com/Loge-Like/bilibili-pip-helper/refs/heads/main/bilibili-pip-helper.js
+   安装用户脚本管理器：Tampermonkey 或 Violentmonkey
 
-    安装用户脚本管理器：Tampermonkey 或 Violentmonkey
+  Github: 
+   [安装脚本](https://raw.githubusercontent.com/Loge-Like/bilibili-pip-helper/refs/heads/main/bilibili-pip-helper.js)
 
-    待   定
+  Greasy Fork: 
+  [安装脚本](https://update.greasyfork.org/scripts/566502/%E5%93%94%E5%93%A9%E5%93%94%E5%93%A9%E8%A7%86%E9%A2%91%E6%B5%AE%E7%AA%97%E5%AE%9A%E4%BD%8D%E5%8A%A9%E6%89%8B.user.js)
   
-      
+
 🛠️ 使用说明
 
     脚本安装后，在B站视频页面会自动在底部控制栏添加一个画中画按钮（📺图标）。点击即可开启/关闭画中画模式。
