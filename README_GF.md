@@ -17,7 +17,7 @@ B站视频浮窗定位助手：页面画中画悬浮播放，更沉浸的体验�
 
     背景遮罩：可调节浓度的毛玻璃效果（支持性能模式关闭动画）
   
-https://raw.githubusercontent.com/Loge-Like/bilibili-pip-helper/refs/heads/main/images/FF91E93C17DA1146A0D.jpg
+https://github.com/Loge-Like/bilibili-pip-helper/raw/main/images/FF91E93C17DA1146A0D.jpg
   
    
 🎯 页面定位系统
@@ -32,7 +32,7 @@ https://raw.githubusercontent.com/Loge-Like/bilibili-pip-helper/refs/heads/main/
 
     自动宽屏：页面加载时自动点击宽屏按钮
 
-https://raw.githubusercontent.com/Loge-Like/bilibili-pip-helper/refs/heads/main/images/D8AA562FC5238B94EEA9.jpg
+https://github.com/Loge-Like/bilibili-pip-helper/raw/main/images/D8AA562FC5238B94EEA9.jpg
    
    
 ⌨️ 其他实用功能
