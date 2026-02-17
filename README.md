@@ -60,6 +60,5 @@ B站视频浮窗定位助手：页面画中画悬浮播放，更沉浸的体验�
     MIT License © 2026 loge-like
 
 
-https://github.com/Loge-Like/bilibili-pip-helper/raw/refs/heads/main/images/FF91E93C17DA1146A0D.PNG
-
-https://github.com/Loge-Like/bilibili-pip-helper/raw/refs/heads/main/images/D8AA562FC5238B94EEA9.png
+https://github.com/Loge-Like/bilibili-pip-helper/blob/main/images/FF91E93C17DA1146A0D.PNG
+https://github.com/Loge-Like/bilibili-pip-helper/blob/main/images/D8AA562FC5238B94EEA9.png
