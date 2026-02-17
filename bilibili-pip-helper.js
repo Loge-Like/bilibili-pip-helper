@@ -3,7 +3,7 @@
 // @homepageURL   https://github.com/Loge-Like/bilibili-pip-helper
 // @supportURL    https://github.com/Loge-Like/bilibili-pip-helper/issues
 // @namespace    http://tampermonkey.net/
-// @version      1.0
+// @version      1.01
 // @description  页面画中画悬浮播放，更沉浸的体验；页面智能定位，告别浏览器放大后的手动拖拽滚动条。优化B站观影体验。
 // @author       萝哥-like
 // @copyright    https://github.com/Loge-Like
@@ -25,7 +25,7 @@
 
 (function() {
     'use strict';
-    console.log('[哔哩哔哩视频浮窗定位助手 v1.0] 加载');
+    console.log('[哔哩哔哩视频浮窗定位助手 v1.01] 加载');
 
     // ==================== 常量与工具函数 ====================
     const SELECTORS = {
@@ -556,7 +556,7 @@
             if (!state.videoContainer) return;
             const currentWidth = state.videoContainer.offsetWidth;
             let newWidth = currentWidth * factor;
-            const minWidth = 300;
+            const minWidth = 250;
             const maxWidth = Math.min(window.innerWidth * 0.95, 7680);
             newWidth = Math.min(Math.max(newWidth, minWidth), maxWidth);
             const aspect = getVideoAspectRatio(state.videoElement, state.videoContainer);
@@ -776,10 +776,8 @@
         // --- 事件绑定/解绑 ---
         function bindEvents() {
             // 点击外部缩小
-            if (ConfigManager.PiP.clickOutsideToShrink) {
-                state.clickOutsideHandler = handleDocumentClick;
-                document.addEventListener('click', state.clickOutsideHandler, true);
-            }
+			state.clickOutsideHandler = handleDocumentClick;
+			document.addEventListener('click', state.clickOutsideHandler, false);
 
             // 全屏按钮监听
             state.fullscreenHandler = handleFullscreenClick;
@@ -792,7 +790,7 @@
 
         function unbindEvents() {
             if (state.clickOutsideHandler) {
-                document.removeEventListener('click', state.clickOutsideHandler, true);
+				document.removeEventListener('click', state.clickOutsideHandler, false);
                 state.clickOutsideHandler = null;
             }
             if (state.fullscreenHandler) {
@@ -814,25 +812,25 @@
                 state.restoreClickHandler = null;
             }
         }
-
-        function handleDocumentClick(e) {
+	
+		function handleDocumentClick(e) {
 			if (!state.enabled || !state.videoContainer) return;
-				const inside = state.videoContainer.contains(e.target);
-				
-				// 如果处于缩小状态，点击视频内部就恢复
-				if (state.isShrunk) {
-					if (inside) {
-						expandToCenter();
-						state.isShrunkByClick = false;
-					}
-					return;
+			const inside = state.videoContainer.contains(e.target);
+			
+			// 如果处于缩小状态，点击视频内部就恢复（始终执行）
+			if (state.isShrunk) {
+				if (inside) {
+					expandToCenter();
+					state.isShrunkByClick = false;
 				}
-				
-				// 未缩小且点击视频外，缩小
-				if (!inside && !state.isShrunk) {
-					shrinkToCorner(true);
-				}
+				return;
 			}
+			
+			// 未缩小且点击视频外，缩小（仅当开关开启时）
+			if (ConfigManager.PiP.clickOutsideToShrink && !inside) {
+				shrinkToCorner(true);
+			}
+		}
         
 
         function handleFullscreenClick(e) {
@@ -1078,7 +1076,7 @@
             setClickShrink: (enabled) => {
                 ConfigManager.PiP.clickOutsideToShrink = enabled;
                 GM_setValue('pip_click_outside_shrink_v18', enabled);
-                if (state.enabled) {
+                /* if (state.enabled) {
                     if (enabled && !state.clickOutsideHandler) {
                         state.clickOutsideHandler = handleDocumentClick;
                         document.addEventListener('click', state.clickOutsideHandler, true);
@@ -1086,7 +1084,7 @@
                         document.removeEventListener('click', state.clickOutsideHandler, true);
                         state.clickOutsideHandler = null;
                     }
-                }
+                } */
             },
             get clickShrinkEnabled() { return ConfigManager.PiP.clickOutsideToShrink; },
             get enabled() { return state.enabled; }
@@ -1448,7 +1446,7 @@
     }
 
     function setPipShrunkSize() {
-        const val = parseInt(prompt('缩小后宽度 (300-800px)', ConfigManager.PiP.shrunkSize), 10);
+        const val = parseInt(prompt('缩小后宽度 (250-800px)', ConfigManager.PiP.shrunkSize), 10);
         if (val >= 300 && val <= 800) {
             ConfigManager.PiP.shrunkSize = val;
             GM_setValue('pip_shrunk_size_v17', val);
@@ -1542,7 +1540,4 @@
         PictureInPictureSystem.cleanup();
         document.body.onkeydown = null;
     });
-
 })();
-
-
