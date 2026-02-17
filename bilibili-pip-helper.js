@@ -1447,7 +1447,7 @@
 
     function setPipShrunkSize() {
         const val = parseInt(prompt('缩小后宽度 (250-800px)', ConfigManager.PiP.shrunkSize), 10);
-        if (val >= 300 && val <= 800) {
+        if (val >= 250 && val <= 800) {
             ConfigManager.PiP.shrunkSize = val;
             GM_setValue('pip_shrunk_size_v17', val);
             alert('已设置');
@@ -1540,4 +1540,5 @@
         PictureInPictureSystem.cleanup();
         document.body.onkeydown = null;
     });
+
 })();
