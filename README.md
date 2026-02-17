@@ -17,9 +17,11 @@ B站视频浮窗定位助手：页面画中画悬浮播放，更沉浸的体验�
 
     背景遮罩：可调节浓度的毛玻璃效果（支持性能模式关闭动画）
 
-<!-- GREASYFORK_START_IGNORE -->
+[//]: # "GREASYFORK_IGNORE_START"
+
 ![菜单](https://github.com/Loge-Like/bilibili-pip-helper/blob/main/images/FF91E93C17DA1146A0D.jpg)
-<!-- GREASYFORK_END_IGNORE -->
+
+[//]: # "GREASYFORK_IGNORE_END"
    
 🎯 页面定位系统
 
@@ -33,9 +35,12 @@ B站视频浮窗定位助手：页面画中画悬浮播放，更沉浸的体验�
 
     自动宽屏：页面加载时自动点击宽屏按钮
 
-<!-- GREASYFORK_START_IGNORE -->
+[//]: # "GREASYFORK_IGNORE_START"
+
 ![缩小画中画](https://github.com/Loge-Like/bilibili-pip-helper/blob/main/images/D8AA562FC5238B94EEA9.jpg)
-<!-- GREASYFORK_END_IGNORE -->
+
+[//]: # "GREASYFORK_IGNORE_END"
+
    
 ⌨️ 其他实用功能
 
