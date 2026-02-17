@@ -1,8 +1,7 @@
 B站视频浮窗定位助手：页面画中画悬浮播放，更沉浸的体验；页面智能定位，告别浏览器放大后的手动拖拽滚动条。优化B站观影体验。
-  
-  
-✨ 功能特点
-  
+
+<br><br>
+
 🎬 画中画系统
 
     视频悬浮播放：将视频窗口脱离页面，随意拖动位置，看视频、刷评论两不误
@@ -17,10 +16,12 @@ B站视频浮窗定位助手：页面画中画悬浮播放，更沉浸的体验�
 
     背景遮罩：可调节浓度的毛玻璃效果（支持性能模式关闭动画）
 
+<br>
 
-![菜单](https://github.com/Loge-Like/bilibili-pip-helper/blob/main/images/FF91E93C17DA1146A0D.jpg)
+![缩小画中画](https://github.com/Loge-Like/bilibili-pip-helper/blob/main/images/D8AA562FC5238B94EEA9.jpg)
 
-   
+<br><br>
+
 🎯 页面定位系统
 
     水平居中：当浏览器窗口放大至需要横向滚动时，自动将视频内容水平居中，再也不用手动拖拽滚动条
@@ -33,18 +34,20 @@ B站视频浮窗定位助手：页面画中画悬浮播放，更沉浸的体验�
 
     自动宽屏：页面加载时自动点击宽屏按钮
 
+<br>
 
-![缩小画中画](https://github.com/Loge-Like/bilibili-pip-helper/blob/main/images/D8AA562FC5238B94EEA9.jpg)
+![菜单](https://github.com/Loge-Like/bilibili-pip-helper/blob/main/images/FF91E93C17DA1146A0D.jpg)
 
+<br><br>
 
-   
 ⌨️ 其他实用功能
 
     防止空格键下滑：按空格键不会滚动页面，方便暂停/播放视频
 
     自动网页全屏：页面加载时自动进入网页全屏（与自动宽屏等互斥）
-   
-   
+
+<br>
+
 📥 安装方法
 
    安装用户脚本管理器：Tampermonkey 或 Violentmonkey
@@ -54,14 +57,15 @@ B站视频浮窗定位助手：页面画中画悬浮播放，更沉浸的体验�
 
   Greasy Fork: 
   [安装脚本](https://update.greasyfork.org/scripts/566502/%E5%93%94%E5%93%A9%E5%93%94%E5%93%A9%E8%A7%86%E9%A2%91%E6%B5%AE%E7%AA%97%E5%AE%9A%E4%BD%8D%E5%8A%A9%E6%89%8B.user.js)
-  
+
+<br>
 
 🛠️ 使用说明
 
     脚本安装后，在B站视频页面会自动在底部控制栏添加一个画中画按钮（📺图标）。点击即可开启/关闭画中画模式。
 
     所有配置项均可在Tampermonkey菜单中调节（脚本管理器图标 → 弹出菜单 → 选择对应项）。
-  
-  
-📄 许可证
-    MIT License © 2026 loge-like
+
+<br>
+
+📄 MIT License © 2026 loge-like
