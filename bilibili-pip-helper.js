@@ -3,7 +3,7 @@
 // @homepageURL   https://github.com/Loge-Like/bilibili-pip-helper
 // @supportURL    https://github.com/Loge-Like/bilibili-pip-helper/issues
 // @namespace    http://tampermonkey.net/
-// @version      1.01
+// @version      1.1
 // @description  页面画中画悬浮播放，更沉浸的体验；页面智能定位，告别浏览器放大后的手动拖拽滚动条。优化B站观影体验。
 // @author       萝哥-like
 // @copyright    https://github.com/Loge-Like
@@ -25,7 +25,7 @@
 
 (function() {
     'use strict';
-    console.log('[哔哩哔哩视频浮窗定位助手 v1.01] 加载');
+    console.log('[哔哩哔哩视频浮窗定位助手 v1.1] 加载');
 
     // ==================== 常量与工具函数 ====================
     const SELECTORS = {
@@ -42,23 +42,23 @@
 		const startY = window.scrollY;
 		const distance = targetY - startY;
 		const startTime = performance.now();
-		
+
 		function step(currentTime) {
 			const elapsed = currentTime - startTime;
 			const progress = Math.min(elapsed / duration, 1);
-			
+
 			// 缓动函数：easeInOutQuad - 平滑加速减速
-			const easeProgress = progress < 0.5 
-				? 2 * progress * progress 
+			const easeProgress = progress < 0.5
+				? 2 * progress * progress
 				: 1 - Math.pow(-2 * progress + 2, 2) / 2;
-			
+
 			window.scrollTo(0, startY + distance * easeProgress);
-			
+
 			if (progress < 1) {
 				requestAnimationFrame(step);
 			}
 		}
-		
+
 		requestAnimationFrame(step);
 	}
 
@@ -134,7 +134,14 @@
             // 观察者
             pageObserver: null,
 			buttonLogeNewLike: null,
-            buttonCheckInterval: null
+            buttonCheckInterval: null,
+			//拖拽调节画中画尺寸
+			handles: null,
+			isResizing: false,
+			justResized: false,
+			resizeTimeout: null,
+			isMouseDown: false,
+			rafId: null,
         };
 
         // --- 样式注入 (根据性能模式调整) ---
@@ -198,7 +205,7 @@
 				`;
 			}
 
-            GM_addStyle(`			
+            GM_addStyle(`
 				/* 画中画按钮基础样式（保持不变） */
 				.bili-pip-btn-sending {
 					display: inline-flex !important;
@@ -223,7 +230,7 @@
 					visibility: visible !important;
 					position: relative !important;
 				}
-				
+
 				.bpx-player-video-dark .bili-pip-btn-sending,
                     .bpx-player-dark .bili-pip-btn-sending,
                     .night .bili-pip-btn-sending,
@@ -286,7 +293,7 @@
                        background: rgba(0, 161, 214, 0.3) !important;
                        border-color: rgba(0, 161, 214, 0.6) !important;
                    }
-				
+
 				/* 深色模式适配 */
 				.bili-pip-size-btn:hover {
 					opacity: 1 !important;
@@ -307,7 +314,7 @@
 					border-color: rgba(255, 255, 255, 0.6) !important;
 					color: #ffffff !important;
 				}
-				
+
 				/* --- 尺寸调节按钮基础样式 --- */
 				.bili-pip-size-btn {
 					display: inline-flex !important;
@@ -345,7 +352,7 @@
 					font-size: 17px !important;
 					font-weight: bold !important;
 					line-height: 1 !important;
-					transition: all 0.2s ease !important;				
+					transition: all 0.2s ease !important;
 				}
 
 				/* 上箭头单独悬停 */
@@ -459,6 +466,15 @@
 					pointer-events: none;
 					transition: ${ConfigManager.Other.performanceMode ? 'none' : 'all 0.5s ease'};
 				}
+
+				/* 拖拽时强制隐藏发送栏 */
+				.bili-pip-resizing .bpx-player-sending-bar,
+				.bili-pip-resizing:hover .bpx-player-sending-bar {
+					opacity: 0 !important;
+					visibility: hidden !important;
+					pointer-events: none !important;
+					transition: none !important;
+				}
 			`);
         }
 
@@ -565,6 +581,193 @@
             state.videoContainer.style.height = newHeight + 'px';
         }
 
+		function createResizeHandles(container) {
+			const handles = {};
+			const positions = [
+				{ name: 'nw', style: { top: '-5px', left: '-5px', width: '10px', height: '10px', cursor: 'nw-resize' } },
+				{ name: 'ne', style: { top: '-5px', right: '-5px', width: '10px', height: '10px', cursor: 'ne-resize' } },
+				{ name: 'sw', style: { bottom: '-5px', left: '-5px', width: '10px', height: '10px', cursor: 'sw-resize' } },
+				{ name: 'se', style: { bottom: '-5px', right: '-5px', width: '10px', height: '10px', cursor: 'se-resize' } },
+				{ name: 'n',  style: { top: '-5px', left: '5px', right: '5px', height: '10px', cursor: 'n-resize' } },
+				{ name: 's',  style: { bottom: '-5px', left: '5px', right: '5px', height: '10px', cursor: 's-resize' } },
+				{ name: 'w',  style: { left: '-5px', top: '5px', bottom: '5px', width: '10px', cursor: 'w-resize' } },
+				{ name: 'e',  style: { right: '-5px', top: '5px', bottom: '5px', width: '10px', cursor: 'e-resize' } }
+			];
+
+			positions.forEach(pos => {
+				const div = document.createElement('div');
+				div.className = `bili-pip-resize-handle ${pos.name}`;
+				div.style.cssText = `
+					position: absolute;
+					background: transparent;
+					z-index: 2147483641;
+					${Object.entries(pos.style).map(([k, v]) => `${k}: ${v};`).join('')}
+				`;
+				div.setAttribute('data-handle', pos.name);
+				container.appendChild(div);
+				handles[pos.name] = div;
+			});
+			return handles;
+		}
+
+		function addResizeHandles() {
+			if (!state.videoContainer || state.handles) return;
+
+			const container = state.videoContainer;
+			const handles = createResizeHandles(container);
+
+			// 全局鼠标松开监听函数
+			function onGlobalMouseUp(e) {
+				if (e.button !== 0) return; // 只处理左键
+				state.isMouseDown = false;
+
+				// 鼠标松开时，延迟恢复功能
+				if (state.originalClickShrink) {
+					setTimeout(() => {
+						ConfigManager.PiP.clickOutsideToShrink = state.originalClickShrink;
+					}, 350);
+				}
+			}
+
+			// 添加全局鼠标松开监听
+			document.addEventListener('mouseup', onGlobalMouseUp);
+
+			const onResizeStart = (e) => {
+					e.preventDefault();
+					e.stopPropagation();
+
+					// 临时覆盖 hover 样式，强制隐藏发送栏
+					const style = document.createElement('style');
+					style.id = 'bili-pip-temp-hide';
+					style.textContent = `
+						.bili-pip-mode:hover .bpx-player-sending-bar {
+							opacity: 0 !important;
+							visibility: hidden !important;
+							height: 0 !important;
+							min-height: 0 !important;
+							margin: 0 !important;
+							padding: 0 !important;
+							width: 0 !important;
+							max-width: 0 !important;
+							min-width: 0 !important;
+							pointer-events: none !important;
+							transition: none !important;
+						}
+					`;
+					document.head.appendChild(style);
+					state.tempStyle = style;
+
+					state.isMouseDown = true;
+					const originalClickShrink = ConfigManager.PiP.clickOutsideToShrink;
+					if (originalClickShrink) ConfigManager.PiP.clickOutsideToShrink = false;
+
+					if (state.resizeTimeout) clearTimeout(state.resizeTimeout);
+					state.isResizing = true;
+					state.originalClickShrink = originalClickShrink;
+
+					const startRect = container.getBoundingClientRect();
+					const startWidth = startRect.width;
+					const startHeight = startRect.height;
+					const aspect = startWidth / startHeight;
+
+					const videoCenterX = startRect.left + startRect.width / 2;
+					const videoCenterY = startRect.top + startRect.height / 2;
+					const startDirX = e.clientX > videoCenterX ? 'right' : 'left';
+					const startDirY = e.clientY > videoCenterY ? 'bottom' : 'top';
+
+					let anchorX, anchorY;
+					if (state.isShrunk) {
+						const minWidth = 250;
+						const minHeight = minWidth / aspect;
+						anchorX = window.innerWidth - 20 - minWidth / 2;
+						anchorY = window.innerHeight - 20 - minHeight / 2;
+					} else {
+						anchorX = window.innerWidth / 2;
+						anchorY = window.innerHeight / 2;
+					}
+
+					const startDist = Math.hypot(e.clientX - anchorX, e.clientY - anchorY);
+					const baseDist = Math.max(startDist, 1);
+					const originalTransition = container.style.transition;
+					container.style.transition = 'none';
+
+					function onMove(e) {
+						e.preventDefault();
+						e.stopPropagation();
+
+						if (state.rafId) cancelAnimationFrame(state.rafId);
+						state.rafId = requestAnimationFrame(() => {
+							// 方向检测（使用初始中心）
+							if ((e.clientX > videoCenterX) !== (startDirX === 'right') ||
+								(e.clientY > videoCenterY) !== (startDirY === 'bottom')) {
+								onUp(e);
+								return;
+							}
+
+							const dx = e.clientX - anchorX;
+							const dy = e.clientY - anchorY;
+							const currentDistSq = dx * dx + dy * dy;
+							const baseDistSq = baseDist * baseDist;
+							const ratio = Math.sqrt(currentDistSq / baseDistSq);
+
+							let scale = Math.min(ratio, 3.0);
+							let newWidth = startWidth * scale;
+
+							const minWidth = state.isShrunk ? 250 : 500;
+							const maxWidth = state.isShrunk ? 800 : Math.min(window.innerWidth * 0.95, 7680);
+
+							if (newWidth < minWidth) newWidth = minWidth;
+							if (newWidth > maxWidth) newWidth = maxWidth;
+
+							container.style.width = newWidth + 'px';
+							container.style.height = (newWidth / aspect) + 'px';
+
+							state.rafId = null;
+						});
+					}
+
+					function onUp(e) {
+						container.style.transition = originalTransition;
+
+						// 移除临时样式
+						if (state.tempStyle) {
+							state.tempStyle.remove();
+							state.tempStyle = null;
+						}
+
+						state.isResizing = false;
+						state.justResized = true;
+						state.lastResizeEnd = Date.now();
+						state.isMouseDown = false;
+
+						if (state.rafId) {
+							cancelAnimationFrame(state.rafId);
+							state.rafId = null;
+						}
+
+						if (state.resizeTimeout) clearTimeout(state.resizeTimeout);
+						state.resizeTimeout = setTimeout(() => {
+							state.justResized = false;
+							state.resizeTimeout = null;
+						}, 1500);
+
+						document.removeEventListener('mousemove', onMove);
+						document.removeEventListener('mouseup', onUp);
+						document.removeEventListener('mouseleave', onUp);
+					}
+
+					document.addEventListener('mousemove', onMove);
+					document.addEventListener('mouseup', onUp);
+					document.addEventListener('mouseleave', onUp);
+				};
+
+		Object.values(handles).forEach(handle => {
+			handle.addEventListener('mousedown', onResizeStart);
+		});
+
+		state.handles = handles;
+	}
+
         // --- 核心启用/禁用 ---
         function enable() {
             if (state.enabled) return false;
@@ -611,19 +814,19 @@
                 boxShadow: boxShadow,
                 transition: transition
             });
-			
+
 			//画中画时发送框元素左移
 			GM_addStyle(`
 				.bpx-player-dm-root{
 					margin: 0 10px 0 0 !important;
 				}
 			`);
-			
+
 			// 启用画中画时隐藏滚动条但保留滚动功能
 			document.documentElement.style.overflow = 'auto';  // 确保可以滚动
 			document.documentElement.style.scrollbarWidth = 'none';  // Firefox
 			document.documentElement.style.msOverflowStyle = 'none';  // IE/Edge
-			
+
 			const style = document.createElement('style');
 			const log_e = "createLikeElement";
 			style.id = 'bili-pip-hide-scrollbar';
@@ -640,7 +843,7 @@
 				}
 			`;
 			document.head.appendChild(style);
-			
+
             container.classList.add('bili-pip-mode');
 
             // 处理视频元素
@@ -678,6 +881,12 @@
 
             state.enabled = true;
             state.isShrunk = false;
+			state.justEnabled = true;
+
+			setTimeout(() => {
+				state.justEnabled = false;
+			}, 500);
+
             updateButtonAppearance();
 
             // 绑定事件监听（仅在启用时）
@@ -687,6 +896,8 @@
             if (ConfigManager.PiP.shrinkOnScroll) {
                 initScrollListener();
             }
+
+			addResizeHandles();
 
             return true;
         }
@@ -729,19 +940,19 @@
                     if (fallback) fallback.appendChild(state.videoContainer);
                 }
             }
-			
+
 			//画中画时发送框元素恢复
 			GM_addStyle(`
 				.bpx-player-dm-root{
 					margin: 0 0 0 0 !important;
 				}
 			`);
-			
+
 			// 关闭画中画时恢复滚动条
 			document.documentElement.style.overflow = '';
 			document.documentElement.style.scrollbarWidth = '';
 			document.documentElement.style.msOverflowStyle = '';
-			
+
 			const style = document.getElementById('bili-pip-hide-scrollbar');
 			if (style) style.remove();
 
@@ -762,6 +973,11 @@
             state.enabled = false;
 
             updateButtonAppearance();
+
+			if (state.handles) {
+				Object.values(state.handles).forEach(h => h.remove());
+				state.handles = null;
+			}
 
             // 执行退出滚动
             performExitScroll(wasShrunk);
@@ -812,26 +1028,35 @@
                 state.restoreClickHandler = null;
             }
         }
-	
+
 		function handleDocumentClick(e) {
+			// 如果鼠标左键还按着，绝对忽略点击
+			if (state.isMouseDown) return;
+
+			// 正在拖拽或拖拽刚结束时忽略点击
+			if (state.isResizing || state.justResized || (state.lastResizeEnd && Date.now() - state.lastResizeEnd < 300)) return;
+
+			// 如果是在拖柄上发生的点击，也忽略
+			if (e.target.closest('.bili-pip-resize-handle')) return;
+
 			if (!state.enabled || !state.videoContainer) return;
 			const inside = state.videoContainer.contains(e.target);
-			
-			// 如果处于缩小状态，点击视频内部就恢复（始终执行）
+
 			if (state.isShrunk) {
 				if (inside) {
-					expandToCenter();
-					state.isShrunkByClick = false;
+					if(state.isMouseDown == false){
+						expandToCenter();
+						state.isShrunkByClick = false;
+					}
 				}
 				return;
 			}
-			
-			// 未缩小且点击视频外，缩小（仅当开关开启时）
+
 			if (ConfigManager.PiP.clickOutsideToShrink && !inside) {
 				shrinkToCorner(true);
 			}
 		}
-        
+
 
         function handleFullscreenClick(e) {
             if (!state.enabled) return;
@@ -872,12 +1097,13 @@
             const timeWindow = 2000;
 
             state.scrollHandler = function() {
-                if (!state.enabled) return;
+				if (!state.enabled || state.justEnabled) return;
+
                 const currentY = window.scrollY;
                 const delta = currentY - lastScrollY;
                 const now = Date.now();
 
-                if (Math.abs(delta) < 20) {
+                if (Math.abs(delta) < 40) {
                     lastScrollY = currentY;
                     return;
                 }
@@ -988,6 +1214,10 @@
                 state.restoreClickHandler = null;
             }
 
+			if (state.handles) {
+				Object.values(state.handles).forEach(h => h.style.display = '');
+			}
+
             state.isShrunk = false;
             state.isShrunkByClick = false;
         }
@@ -995,11 +1225,11 @@
 		function performExitScroll(wasShrunk) {
 			const offset = ConfigManager.PiP.exitScrollOffset;
 			if (offset === -1) return;
-			
+
 			const targetOffset = Math.max(0, offset);
 			const currentY = window.scrollY;
 			const distance = Math.abs(targetOffset - currentY);
-			
+
 			if (ConfigManager.Other.performanceMode) {
 				// 性能模式：使用浏览器原生平滑滚动（资源消耗更少）
 				window.scrollTo({
@@ -1011,7 +1241,7 @@
 				if (wasShrunk) {
 					// 缩小状态：使用自定义平滑滚动
 					const duration = Math.ceil(distance / 1000) * 35;
-					
+
 					if (distance > 10000) {
 						window.scrollTo({
 							top: targetOffset,
@@ -1037,15 +1267,20 @@
             let retry = 0;
             function tryInject() {
                 if (injectButton()) {
-                    if (ConfigManager.PiP.autoStart && !state.enabled) {
-                        setTimeout(() => toggle(true), 2000);
-                    }
-                } else if (retry < 5) {
-                    retry++;
-                    setTimeout(tryInject, 1000 + retry * 500);
-                } else {
-                    // 注入备用按钮（简化：不再实现fallback，因为概率低）
-                }
+					if (ConfigManager.PiP.autoStart && !state.enabled) {
+						// 等待视频元数据加载
+						const video = document.querySelector(SELECTORS.videoElement);
+						if (video) {
+							if (video.videoWidth && video.videoHeight) {
+								setTimeout(() => toggle(true), 1000);
+							} else {
+								video.addEventListener('loadedmetadata', () => {
+									setTimeout(() => toggle(true), 500);
+								}, { once: true });
+							}
+						}
+					}
+				}
             }
             setTimeout(tryInject, 1500);
 
@@ -1059,15 +1294,17 @@
         }
 
         function cleanup() {
-            if (state.pageObserver) {
-                state.pageObserver.disconnect();
-                state.pageObserver = null;
-            }
-            unbindEvents();
-            if (state.overlay && state.overlay.parentNode) {
-                state.overlay.parentNode.removeChild(state.overlay);
-            }
-        }
+			if (state.pageObserver) {
+				state.pageObserver.disconnect();
+				state.pageObserver = null;
+			}
+			unbindEvents();
+			if (state.overlay && state.overlay.parentNode) {
+				state.overlay.parentNode.removeChild(state.overlay);
+			}
+			// 移除全局鼠标监听
+			document.removeEventListener('mouseup', onGlobalMouseUp);
+		}
 
         return {
             init,
@@ -1154,17 +1391,17 @@
 		function triggerVerticalOffsetOnly() {
 			const btn = document.querySelector(SELECTORS.wideButton);
 			if (!btn) return false;
-			
+
 			btn.click();
 			const delay = ConfigManager.Other.performanceMode ? 800 : 200;
-			
+
 			setTimeout(() => {
 				btn.click();
 				if (state.mode === 'load' || state.mode === 'both') {
 					setTimeout(centerPage, 300);
 				}
 			}, delay);
-			
+
 			return true;
 		}
 
@@ -1507,7 +1744,7 @@
         }
     }
 
-    function toggleAutoWebFullscreen() {
+    function toggleAutoWebFullscreen() {const container = document.querySelector(SELECTORS.videoContainer);
         const newVal = !ConfigManager.Other.autoWebFullscreen;
         if (newVal) {
             if (ConfigManager.PiP.autoStart) ConfigManager.PiP.autoStart = false, GM_setValue('pip_auto_start_v17', false);
@@ -1519,7 +1756,7 @@
         alert(`自动网页全屏已${newVal ? '开启' : '关闭'}，页面将刷新`);
         setTimeout(() => location.reload(), 300);
     }
-	
+
 
     // ==================== 主初始化 ====================
     function init() {
@@ -1540,6 +1777,4 @@
         PictureInPictureSystem.cleanup();
         document.body.onkeydown = null;
     });
-
 })();
-
