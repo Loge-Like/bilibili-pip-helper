@@ -14,7 +14,6 @@
 // @match        *://www.bilibili.com/list/*
 // @match        *://www.bilibili.com/medialist/play/*
 // @match        *://www.bilibili.com/playlist/*
-// @match        *://www.bilibili.com/festival/*
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_registerMenuCommand
@@ -1778,3 +1777,4 @@
         document.body.onkeydown = null;
     });
 })();
+
