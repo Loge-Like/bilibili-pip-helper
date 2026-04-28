@@ -2,6 +2,8 @@
 
 哔哩哔哩视频浮窗定位助手 v2.0： 一个用于 B 站视频页面的 Tampermonkey 脚本，提供画中画悬浮播放、页面自动定位和动态视觉特效。
 
+![展示](https://github.com/Loge-Like/bilibili-pip-helper/blob/main/images/effect_orb.jpg)
+
 <br><br>
 
 📝 更新
@@ -43,7 +45,7 @@
 
 <br>
 
-![菜单](https://github.com/Loge-Like/bilibili-pip-helper/blob/main/images/FF91E93C17DA1146A0D.jpg)
+![面板](https://github.com/Loge-Like/bilibili-pip-helper/blob/main/images/panel_pip.jpg)
 
 <br><br>
 
@@ -56,6 +58,10 @@
     播放 / 暂停时自动进入 / 退出浏览器全屏
 
 <br>
+
+![面板](https://github.com/Loge-Like/bilibili-pip-helper/blob/main/images/panel_automation.jpg)
+
+<br><br>
 
 ⌨️ 其他功能
 
