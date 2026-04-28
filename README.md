@@ -71,13 +71,13 @@
 
 📥 安装方法
 
-       安装用户脚本管理器：Tampermonkey 或 Violentmonkey
+&emsp;&emsp;安装用户脚本管理器：Tampermonkey 或 Violentmonkey
     
-      Github: 
-       [安装脚本](https://raw.githubusercontent.com/Loge-Like/bilibili-pip-helper/refs/heads/main/bilibili-pip-helper.js)
+&emsp;&emsp;Github: 
+[安装脚本](https://raw.githubusercontent.com/Loge-Like/bilibili-pip-helper/refs/heads/main/bilibili-pip-helper.js)
     
-      Greasy Fork: 
-      [安装脚本](https://update.greasyfork.org/scripts/566502/%E5%93%94%E5%93%A9%E5%93%94%E5%93%A9%E8%A7%86%E9%A2%91%E6%B5%AE%E7%AA%97%E5%AE%9A%E4%BD%8D%E5%8A%A9%E6%89%8B.user.js)
+&emsp;&emsp;Greasy Fork: 
+[安装脚本](https://update.greasyfork.org/scripts/566502/%E5%93%94%E5%93%A9%E5%93%94%E5%93%A9%E8%A7%86%E9%A2%91%E6%B5%AE%E7%AA%97%E5%AE%9A%E4%BD%8D%E5%8A%A9%E6%89%8B.user.js)
 
 <br>
 
