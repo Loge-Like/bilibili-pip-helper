@@ -3,7 +3,7 @@
 // @homepageURL   https://github.com/Loge-Like/bilibili-pip-helper
 // @supportURL    https://github.com/Loge-Like/bilibili-pip-helper/issues
 // @namespace    http://tampermonkey.net/
-// @version      2.0
+// @version      2.01
 // @description  页面画中画悬浮播放，更沉浸的体验；页面智能定位，告别浏览器放大后的手动拖拽滚动条。优化B站观影体验。
 // @author       萝哥-like
 // @copyright    https://github.com/Loge-Like
@@ -4962,30 +4962,27 @@
 		}
 		
 		function triggerVerticalScroll() {
-			if (ConfigManager.Horizontal.verticalOffset <= 0) return;
-			
-			let lastHeight = document.documentElement.scrollHeight;
-			let stableCount = 0;
-			
-			const stabilityCheck = setInterval(() => {
-				const currentHeight = document.documentElement.scrollHeight;
-				
-				if (currentHeight === lastHeight) {
-					stableCount++;
-					if (stableCount >= 5) {
-						clearInterval(stabilityCheck);
-						verticalScroll();
-					}
-				} else {
-					stableCount = 0;
-					lastHeight = currentHeight;
-				}
-			}, 100);
-			
-			setTimeout(() => {
-				clearInterval(stabilityCheck);
+			if (ConfigManager.Horizontal.verticalOffset > 0) {
 				verticalScroll();
-			}, 5000);
+
+				let checkCount = 0;
+				const maxChecks = 50;
+				const targetY = Math.max(state.videoTopOffset ? state.targetY : ConfigManager.Horizontal.verticalOffset, 10);
+
+				const checkScroll = setInterval(() => {
+					checkCount++;
+					const currentY = window.scrollY;
+
+					if (Math.abs(currentY - targetY) < 10) {
+						clearInterval(checkScroll);
+						return;
+					}
+
+					if (checkCount >= maxChecks) {
+						clearInterval(checkScroll);
+					}
+				}, 100);
+			}
 		}
 		
 		function triggerLoadPosition() {
