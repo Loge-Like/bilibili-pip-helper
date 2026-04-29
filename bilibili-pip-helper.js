@@ -5365,7 +5365,7 @@
 					PictureInPictureSystem.enable();
 					globalState.isUrlChange = false;
 					urlChangeTimer = null;
-				}, 300);
+				}, 600);
 			}
 		}
     }
